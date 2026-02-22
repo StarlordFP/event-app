@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0                  # or mysql:8.4 if you want newest
+    container_name: event-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root       # change this in production!
+      MYSQL_DATABASE: event_db
+      MYSQL_USER: appuser             # optional - better than root
+      MYSQL_PASSWORD: appsecret       # optional
+    ports:
+      - "3306:3306"                   # maps container 3306 → your localhost:3306
+    volumes:
+      - mysql-data:/var/lib/mysql     # persists data even if container stops
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql-data:
