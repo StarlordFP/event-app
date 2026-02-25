@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { TagsService } from './tags.service.js';
+import { TagsService } from './tags.service';
 
 export class TagsController {
   private service = new TagsService();

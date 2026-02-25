@@ -1,5 +1,5 @@
 import knex, { Knex } from 'knex';
-import { config } from './index.js';
+import { config } from './index';
 
 const baseConfig: Knex.Config = {
   client: 'mysql2',

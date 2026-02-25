@@ -1,4 +1,4 @@
-import { db } from '../../config/db.js';
+import { db } from '../../config/db';
 
 /**
  * Tags and event-tag links. Used by EventsService for tag sync.

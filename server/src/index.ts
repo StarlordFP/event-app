@@ -4,8 +4,8 @@ import cookieParser from 'cookie-parser';
 import { config } from './config';
 import { authRouter } from './modules/auth/auth.router';
 import { eventsRouter } from './modules/events/events.router';
-import { tagsRouter } from './modules/tags/tags.router.js';
-import { swaggerUiHandler, swaggerSetup } from './swagger.js';
+import { tagsRouter } from './modules/tags/tags.router';
+import { swaggerUiHandler, swaggerSetup } from './swagger';
 import { notFound, errorHandler } from './middleware/errorHandler';
 
 const app = express();

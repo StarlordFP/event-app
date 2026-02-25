@@ -1,5 +1,5 @@
-import { db } from '../../config/db.js';
-import { TagsRepository } from '../tags/tags.repository.js';
+import { db } from '../../config/db';
+import { TagsRepository } from '../tags/tags.repository';
 
 export interface EventRow {
   id: number;
