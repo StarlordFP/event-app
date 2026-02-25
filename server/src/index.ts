@@ -1,32 +1,29 @@
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
-dotenv.config();
-
-import authRoutes from './routes/authRoutes.js';
-import eventRoutes from './routes/eventRoutes.js';
-import tagRoutes from './routes/tagRoutes.js';
-import { errorHandler } from './middleware/errorHandler.js';
+import cookieParser from 'cookie-parser';
+import { config } from './config';
+import { authRouter } from './modules/auth/auth.router';
+import { eventsRouter } from './modules/events/events.router';
+import { tagsRouter } from './modules/tags/tags.router.js';
+import { swaggerUiHandler, swaggerSetup } from './swagger.js';
+import { notFound, errorHandler } from './middleware/errorHandler';
 
 const app = express();
 
-// ─── Global Middleware ────────────────────────────────────────────────────────
-app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173' }));
+app.use(cors({ origin: config.CORS_ORIGIN, credentials: true }));
+app.use(cookieParser());
 app.use(express.json());
 
-// ─── Routes ──────────────────────────────────────────────────────────────────
-app.use('/api/auth', authRoutes);
-app.use('/api/events', eventRoutes);
-app.use('/api/tags', tagRoutes);
+app.use('/api/auth', authRouter);
+app.use('/api/events', eventsRouter);
+app.use('/api/tags', tagsRouter);
 
-app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
+app.use('/api-docs', swaggerUiHandler, swaggerSetup);
 
-// ─── Error Handler (must be last) ─────────────────────────────────────────────
+app.use(notFound);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+app.listen(config.PORT, () => {
+  console.log(`Server running on http://localhost:${config.PORT}`);
+  console.log(`DB: ${config.DB_HOST}:${config.DB_PORT} / ${config.DB_NAME} (user: ${config.DB_USER})`);
 });
-
-export default app;

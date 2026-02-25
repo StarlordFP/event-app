@@ -1,24 +1,23 @@
 version: '3.8'
 
 services:
-  db:
-    image: mysql:8.0                  # or mysql:8.4 if you want newest
-    container_name: event-db
-    restart: always
+  mysql:
+    image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: root       # change this in production!
-      MYSQL_DATABASE: event_db
-      MYSQL_USER: appuser             # optional - better than root
-      MYSQL_PASSWORD: appsecret       # optional
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: event_app
+      MYSQL_USER: app
+      MYSQL_PASSWORD: app
     ports:
-      - "3306:3306"                   # maps container 3306 → your localhost:3306
+      - "3306:3306"
     volumes:
-      - mysql-data:/var/lib/mysql     # persists data even if container stops
+      - mysql_data:/var/lib/mysql
+      - ./backend/docker/init-grants.sql:/docker-entrypoint-initdb.d/init-grants.sql:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
+      interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
 
 volumes:
-  mysql-data:
+  mysql_data:
