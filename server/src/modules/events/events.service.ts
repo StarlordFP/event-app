@@ -20,6 +20,9 @@ export class EventsService {
       tag: query.tag,
       event_type: query.event_type,
       requesterId,
+      search: query.search,        
+      sort_by: query.sort_by,      
+      sort_order: query.sort_order,
     });
     const withTags = await this.repo.attachTags(data);
     return { data: withTags, total };
