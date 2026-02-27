@@ -8,12 +8,10 @@ A full-stack event management application built with Node.js, TypeScript, React,
 
 - Authentication with JWT access tokens and refresh token rotation
 - Email verification on signup
-- Two-Factor Authentication (2FA) with Google Authenticator
 - Create, edit, and delete events
 - Public and private event visibility
 - Tag-based filtering
 - Search events by title, description, or location
-- Sort events by date or creation time
 - Pagination
 
 ---
