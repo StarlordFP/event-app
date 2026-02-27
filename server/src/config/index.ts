@@ -18,4 +18,11 @@ export const config = {
   DB_USER: process.env.DB_USER || 'root',
   DB_PASSWORD: process.env.DB_PASSWORD || '',
   DB_NAME: process.env.DB_NAME || 'event_app',
+
+  TWO_FA_APP_NAME: process.env.TWO_FA_APP_NAME || 'EventApp',
+  EMAIL_USER: process.env.EMAIL_USER || '',
+  EMAIL_PASS: process.env.EMAIL_PASS || '',
+  EMAIL_FROM: process.env.EMAIL_FROM || '',
+  CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:5173'
+
 } as const;

@@ -5,9 +5,10 @@ type User = { id: number; email: string; name: string };
 interface AuthContextValue {
   user: User | null;
   token: string | null;
-  login: (email: string, password: string) => Promise<{ error?: string }>;
-  signup: (email: string, password: string, name: string) => Promise<{ error?: string }>;
+  login: (email: string, password: string) => Promise<{ error?: string; requires2FA?: boolean; userId?: number }>;
+  signup: (email: string, password: string, name: string) => Promise<{ error?: string; message?: string }>;
   logout: () => Promise<void>;
+  verify2FA: (userId: number, code: string) => Promise<{ error?: string }>;
   isReady: boolean;
 }
 
@@ -51,9 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser,
       refresh,
     };
-    return () => {
-      delete window.__auth;
-    };
+    return () => { delete window.__auth; };
   }, [refresh]);
 
   useEffect(() => {
@@ -71,6 +70,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!res.ok) {
       return { error: data.error || 'Login failed' };
     }
+    // 2FA required — don't set token yet
+    if (data.requires2FA) {
+      return { requires2FA: true, userId: data.userId };
+    }
     setUser(data.user);
     setToken(data.token);
     return {};
@@ -87,6 +90,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!res.ok) {
       return { error: data.error || data.details?.[0]?.message || 'Signup failed' };
     }
+    // Signup now returns a message, not tokens
+    return { message: data.message };
+  }, []);
+
+  const verify2FA = useCallback(async (userId: number, code: string) => {
+    const res = await fetch('/api/auth/2fa/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ userId, code }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      return { error: data.error || '2FA verification failed' };
+    }
     setUser(data.user);
     setToken(data.token);
     return {};
@@ -98,7 +116,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setToken(null);
   }, []);
 
-  const value: AuthContextValue = { user, token, login, signup, logout, isReady };
+  const value: AuthContextValue = { user, token, login, signup, logout, verify2FA, isReady };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

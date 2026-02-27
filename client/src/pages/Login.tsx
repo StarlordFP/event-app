@@ -21,6 +21,11 @@ export default function Login() {
       setError(result.error);
       return;
     }
+    // 2FA required — redirect with userId
+    if (result.requires2FA) {
+      navigate('/2fa-verify', { state: { userId: result.userId } });
+      return;
+    }
     navigate('/', { replace: true });
   }
 
@@ -55,6 +60,10 @@ export default function Login() {
       </form>
       <p style={{ marginTop: '1rem', textAlign: 'center', color: 'var(--text-muted)' }}>
         Don't have an account? <Link to="/signup">Sign up</Link>
+      </p>
+      <p style={{ marginTop: '0.5rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+        Didn't get a verification email?{' '}
+        <Link to="/resend-verification">Resend it</Link>
       </p>
     </div>
   );

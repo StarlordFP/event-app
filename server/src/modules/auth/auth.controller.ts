@@ -20,11 +20,12 @@ export class AuthController {
     res.clearCookie(config.REFRESH_COOKIE_NAME, { path: '/', httpOnly: true });
   }
 
+  // ─── Existing ─────────────────────────────────────────────
+
   signup = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { user, token, refreshToken } = await this.service.signup(req.body);
-      this.setRefreshCookie(res, refreshToken);
-      res.status(201).json({ user, token });
+      const result = await this.service.signup(req.body);
+      res.status(201).json(result); // just returns { message }
     } catch (err) {
       next(err);
     }
@@ -32,9 +33,14 @@ export class AuthController {
 
   login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { user, token, refreshToken } = await this.service.login(req.body);
-      this.setRefreshCookie(res, refreshToken);
-      res.json({ user, token });
+      const result = await this.service.login(req.body);
+      // if 2FA required, don't set cookie yet
+      if (result.requires2FA) {
+        res.json({ requires2FA: true, userId: result.userId });
+        return;
+      }
+      this.setRefreshCookie(res, result.refreshToken!);
+      res.json({ user: result.user, token: result.token });
     } catch (err) {
       next(err);
     }
@@ -59,6 +65,69 @@ export class AuthController {
       await this.service.logout(raw);
       this.clearRefreshCookie(res);
       res.status(204).send();
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  // ─── Email Verification ───────────────────────────────────
+
+  verifyEmail = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const result = await this.service.verifyEmail(req.body.token);
+      res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  resendVerification = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const result = await this.service.resendVerification(req.body.email);
+      res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  // ─── 2FA ──────────────────────────────────────────────────
+
+  setup2FA = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const userId = (req as any).user.userId;
+      const result = await this.service.setup2FA(userId);
+      res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  enable2FA = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const userId = (req as any).user.userId;
+      const result = await this.service.enable2FA(userId, req.body.code);
+      res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  verify2FA = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { userId, code } = req.body;
+      const { user, token, refreshToken } = await this.service.verify2FA(userId, code);
+      this.setRefreshCookie(res, refreshToken);
+      res.json({ user, token });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  disable2FA = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const userId = (req as any).user.userId;
+      const result = await this.service.disable2FA(userId, req.body.code);
+      res.json(result);
     } catch (err) {
       next(err);
     }

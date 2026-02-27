@@ -5,12 +5,31 @@ export interface UserRow {
   email: string;
   name: string;
   password_hash: string;
+  is_verified: boolean;
+}
+
+export interface EmailVerificationRow {
+  id: number;
+  user_id: number;
+  token: string;
+  is_used: boolean;
+  expires_at: Date;
+}
+
+export interface TwoFARow {
+  id: number;
+  user_id: number;
+  secret: string;
+  is_enabled: boolean;
 }
 
 /**
- * Users and refresh_tokens. Used only by AuthService.
+ * Users, refresh_tokens, email_verifications, user_2fa
+ * Used only by AuthService.
  */
 export class AuthRepository {
+  // ─── existing user methods ───────────────────────────────
+
   async findUserByEmail(email: string): Promise<UserRow | undefined> {
     return db('users').where({ email }).first();
   }
@@ -19,19 +38,35 @@ export class AuthRepository {
     return db('users').where({ id }).first();
   }
 
-  async createUser(data: { email: string; name: string; password_hash: string }): Promise<number> {
+  async createUser(data: {
+    email: string;
+    name: string;
+    password_hash: string;
+  }): Promise<number> {
     const [id] = await db('users').insert(data);
     return id;
   }
 
-  async findRefreshToken(tokenHash: string): Promise<{ id: number; user_id: number; expires_at: Date } | undefined> {
+  async updateIsVerified(userId: number): Promise<void> {
+    await db('users').where({ id: userId }).update({ is_verified: true });
+  }
+
+  // ─── existing refresh token methods ──────────────────────
+
+  async findRefreshToken(
+    tokenHash: string
+  ): Promise<{ id: number; user_id: number; expires_at: Date } | undefined> {
     return db('refresh_tokens')
       .where({ token_hash: tokenHash })
       .where('expires_at', '>', new Date())
       .first();
   }
 
-  async createRefreshToken(data: { user_id: number; token_hash: string; expires_at: Date }): Promise<void> {
+  async createRefreshToken(data: {
+    user_id: number;
+    token_hash: string;
+    expires_at: Date;
+  }): Promise<void> {
     await db('refresh_tokens').insert(data);
   }
 
@@ -41,5 +76,64 @@ export class AuthRepository {
 
   async deleteRefreshTokenByHash(tokenHash: string): Promise<void> {
     await db('refresh_tokens').where({ token_hash: tokenHash }).del();
+  }
+
+  // ─── email verification methods ──────────────────────────
+
+  async createVerificationToken(data: {
+    user_id: number;
+    token: string;
+    expires_at: Date;
+  }): Promise<void> {
+    await db('email_verifications').insert(data);
+  }
+
+  async findVerificationToken(
+    token: string
+  ): Promise<EmailVerificationRow | undefined> {
+    return db('email_verifications').where({ token }).first();
+  }
+
+  async markTokenAsUsed(token: string): Promise<void> {
+    await db('email_verifications')
+      .where({ token })
+      .update({ is_used: true });
+  }
+
+  // ─── 2FA methods ─────────────────────────────────────────
+
+  async create2FASecret(data: {
+    user_id: number;
+    secret: string;
+  }): Promise<void> {
+    await db('user_2fa').insert(data);
+  }
+
+  async get2FAByUserId(userId: number): Promise<TwoFARow | undefined> {
+    return db('user_2fa').where({ user_id: userId }).first();
+  }
+
+  async enable2FA(userId: number): Promise<void> {
+    await db('user_2fa')
+      .where({ user_id: userId })
+      .update({ is_enabled: true });
+  }
+
+  async disable2FA(userId: number): Promise<void> {
+    await db('user_2fa').where({ user_id: userId }).del();
+  }
+
+  async upsert2FASecret(data: {
+    user_id: number;
+    secret: string;
+  }): Promise<void> {
+    const existing = await this.get2FAByUserId(data.user_id);
+    if (existing) {
+      await db('user_2fa')
+        .where({ user_id: data.user_id })
+        .update({ secret: data.secret, is_enabled: false });
+    } else {
+      await this.create2FASecret(data);
+    }
   }
 }

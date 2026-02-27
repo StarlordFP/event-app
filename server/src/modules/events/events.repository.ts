@@ -24,6 +24,9 @@ interface ListQuery {
   tag?: string;
   event_type?: string;
   requesterId?: number;
+  search?: string;                              
+  sort_by?: 'date' | 'popularity' | 'created_at'; 
+  sort_order?: 'asc' | 'desc';
 }
 
 /**
@@ -50,7 +53,7 @@ export class EventsRepository {
   }
 
   async findAll(query: ListQuery): Promise<{ data: EventRow[]; total: number }> {
-    const { page, limit, filter, tag, event_type, requesterId } = query;
+    const { page, limit, filter, tag, event_type, requesterId, search, sort_by, sort_order } = query;
     const offset = (page - 1) * limit;
     let q = this.baseSelect();
 
@@ -77,9 +80,29 @@ export class EventsRepository {
       }
     }
 
+    // Search in title, description, and location for the search term
+    if (search) {
+      q = q.andWhere(function (this: any) {
+        this.whereILike('events.title', `%${search}%`)
+          .orWhereILike('events.description', `%${search}%`)
+          .orWhereILike('events.location', `%${search}%`);
+      });
+    }
+
+    // Sorting 
+    const order = sort_order ?? 'desc';
+    if (sort_by === 'date') {
+      q = q.orderBy('events.event_date', order);
+    } else if (sort_by === 'created_at') {
+      q = q.orderBy('events.created_at', order);
+    } else {
+      // default
+      q = q.orderBy('events.event_date', 'asc');
+    }
+
     const countQ = q.clone().clearSelect().clearOrder().count('* as count').first();
     const [data, countResult] = await Promise.all([
-      q.orderBy('events.event_date', 'asc').limit(limit).offset(offset),
+      q.limit(limit).offset(offset),
       countQ,
     ]);
     const total = Number((countResult as any)?.count ?? 0);

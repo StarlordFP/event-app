@@ -6,6 +6,9 @@ export const EventQuerySchema = z.object({
   filter: z.enum(['upcoming', 'past']).optional(),
   tag: z.string().trim().optional(),
   event_type: z.enum(['public', 'private']).optional(),
+  search: z.string().trim().optional(), // for searching in title/description
+  sort_by: z.enum(['date', 'popularity', 'created_at']).optional(),  
+  sort_order: z.enum(['asc', 'desc']).optional(),
 });
 export type EventQuery = z.infer<typeof EventQuerySchema>;
 

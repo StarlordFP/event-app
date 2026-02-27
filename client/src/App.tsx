@@ -7,6 +7,9 @@ import EventList from './pages/EventList';
 import EventDetail from './pages/EventDetail';
 import CreateEvent from './pages/CreateEvent';
 import EditEvent from './pages/EditEvent';
+import VerifyEmail from './pages/VerifyEmail';
+import ResendVerification from './pages/ResendVerification';
+import TwoFactorVerify from './pages/TwoFactorVerify';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { token, isReady } = useAuth();
@@ -18,6 +21,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <Routes>
+      {/* Public auth routes outside layout */}
+      <Route path="/verify-email" element={<VerifyEmail />} />
+      <Route path="/resend-verification" element={<ResendVerification />} />
+      <Route path="/2fa-verify" element={<TwoFactorVerify />} />
+
       <Route path="/" element={<Layout />}>
         <Route index element={<EventList />} />
         <Route path="events/:id" element={<EventDetail />} />
