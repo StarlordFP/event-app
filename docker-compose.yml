@@ -12,7 +12,7 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./backend/docker/init-grants.sql:/docker-entrypoint-initdb.d/init-grants.sql:ro
+      - ./server/docker/init-grants.sql:/docker-entrypoint-initdb.d/init-grants.sql:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 5s
