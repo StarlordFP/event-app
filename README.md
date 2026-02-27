@@ -45,60 +45,8 @@ event-app/
 
 ## Getting Started
 
-### Option A — Docker (Recommended)
 
-The easiest way to run the entire app with one command.
-
-**Prerequisites:**
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running
-
-**Steps:**
-
-1. Clone the repository
-```bash
-git clone https://github.com/StarlordFP/event-app.git
-cd event-app
-```
-
-2. Create your environment file
-```bash
-cp .env.example .env
-```
-
-3. Fill in your `.env` values (see [Environment Variables](#environment-variables) below)
-
-4. Start everything
-```bash
-docker-compose up --build
-```
-
-5. Open your browser
-```
-Frontend: http://localhost:3000
-Backend:  http://localhost:4000
-```
-
-That's it! Docker will:
-- Start MySQL and wait for it to be healthy
-- Run database migrations automatically
-- Start the backend server
-- Build and serve the React frontend
-
-**To stop:**
-```bash
-docker-compose down
-```
-
-**To stop and delete all data:**
-```bash
-docker-compose down -v
-```
-
----
-
-### Option B — Manual Setup
-
-Run each part separately without Docker.
+### Manual Setup
 
 **Prerequisites:**
 - Node.js 18+
