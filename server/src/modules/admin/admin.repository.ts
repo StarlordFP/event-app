@@ -15,7 +15,7 @@ export interface AdminUserRow {
  */
 export class AdminRepository {
 
-  // ─── Users ────────────────────────────────────────────────
+  // Users
 
   async findAllUsers(): Promise<AdminUserRow[]> {
     return db('users').select('id', 'email', 'name', 'role', 'is_verified', 'created_at')
@@ -40,7 +40,7 @@ export class AdminRepository {
     await db('users').where({ id: userId }).del();
   }
 
-  // ─── Events ───────────────────────────────────────────────
+  // Events
 
   async findAllEvents(): Promise<any[]> {
     return db('events')

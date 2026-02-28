@@ -9,12 +9,12 @@ const ctrl = new AdminController();
 // All admin routes require authentication + admin role
 router.use(authenticate, authorize('admin'));
 
-// ─── Users ────────────────────────────────────────────────
+// Users
 router.get('/users', ctrl.getAllUsers);
 router.patch('/users/:id/role', ctrl.updateUserRole);
 router.delete('/users/:id', ctrl.deleteUser);
 
-// ─── Events ───────────────────────────────────────────────
+// Events
 router.get('/events', ctrl.getAllEvents);
 router.delete('/events/:id', ctrl.deleteEvent);
 

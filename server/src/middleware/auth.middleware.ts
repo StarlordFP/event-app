@@ -11,25 +11,8 @@ export interface JwtPayload {
   exp?: number;
 }
 
-// export type Role = 'admin' | 'organizer' | 'attendee';
+ //Validates Bearer token and attaches user info. Rejects if invalid.
 
-// export function authorize(...roles: Role[]) {
-//   return (req: Request, _res: Response, next: NextFunction): void => {
-//     if (!req.user) {
-//       next(new UnauthorizedError('Authentication required'));
-//       return;
-//     }
-//     if (!roles.includes(req.user.role as Role)) {
-//       next(new ForbiddenError(`Access denied. Required role: ${roles.join(' or ')}`));
-//       return;
-//     }
-//     next();
-//   };
-// }
-
-/**
- * Require valid Bearer token. Sets req.user and req.userId. Passes UnauthorizedError to next() otherwise.
- */
 export function authenticate(req: Request, _res: Response, next: NextFunction): void {
   const header = req.headers.authorization;
   if (!header?.startsWith('Bearer ')) {
@@ -47,9 +30,8 @@ export function authenticate(req: Request, _res: Response, next: NextFunction): 
   }
 }
 
-/**
- * Optional auth: attach user if valid token present; never reject.
- */
+ //Attaches user info from Bearer token if present. Always allows request through.
+ 
 export function optionalAuth(req: Request, _res: Response, next: NextFunction): void {
   const header = req.headers.authorization;
   if (header?.startsWith('Bearer ')) {

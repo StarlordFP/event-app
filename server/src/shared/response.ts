@@ -1,7 +1,3 @@
-/**
- * Consistent HTTP response helpers. Controllers use these instead of ad-hoc res.json().
- */
-
 export function success<T>(data: T): { data: T } {
   return { data };
 }

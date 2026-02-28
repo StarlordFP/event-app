@@ -21,17 +21,3 @@ export const VerifyEmailSchema = z.object({
 export const ResendVerificationSchema = z.object({
   email: z.string().email(),
 });
-
-// 2FA
-export const Verify2FASchema = z.object({
-  userId: z.number().int().min(1),
-  code: z.string().length(6, 'Code must be 6 digits'),
-});
-
-export const Enable2FASchema = z.object({
-  code: z.string().length(6, 'Code must be 6 digits'),
-});
-
-export const Disable2FASchema = z.object({
-  code: z.string().length(6, 'Code must be 6 digits'),
-});

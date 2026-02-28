@@ -1,8 +1,5 @@
 import { db } from '../../config/db';
 
-/**
- * Tags and event-tag links. Used by EventsService for tag sync.
- */
 export class TagsRepository {
   private readonly TABLE = 'tags';
   private readonly LINK_TABLE = 'event_tags';
@@ -20,7 +17,6 @@ export class TagsRepository {
     return id;
   }
 
-  /** Get or create tag by name; return id. */
   async getOrCreateByName(name: string): Promise<number> {
     let row = await this.findByName(name);
     if (!row) {

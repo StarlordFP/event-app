@@ -29,7 +29,6 @@ export interface TwoFARow {
  * Used only by AuthService.
  */
 export class AuthRepository {
-  // ─── existing user methods ───────────────────────────────
 
   async findUserByEmail(email: string): Promise<UserRow | undefined> {
     return db('users').where({ email }).first();
@@ -52,7 +51,6 @@ export class AuthRepository {
     await db('users').where({ id: userId }).update({ is_verified: true });
   }
 
-  // ─── existing refresh token methods ──────────────────────
 
   async findRefreshToken(
     tokenHash: string
@@ -79,7 +77,7 @@ export class AuthRepository {
     await db('refresh_tokens').where({ token_hash: tokenHash }).del();
   }
 
-  // ─── email verification methods ──────────────────────────
+  // email verification methods
 
   async createVerificationToken(data: {
     user_id: number;

@@ -8,7 +8,7 @@ import { NotFoundError, ForbiddenError } from '../../shared/errors';
 export class AdminService {
   private repo = new AdminRepository();
 
-  // ─── Users ────────────────────────────────────────────────
+  // Users
 
   async getAllUsers() {
     return this.repo.findAllUsers();
@@ -44,7 +44,7 @@ export class AdminService {
     return { message: 'User deleted successfully' };
   }
 
-  // ─── Events ───────────────────────────────────────────────
+  // Events
 
   async getAllEvents() {
     return this.repo.findAllEvents();

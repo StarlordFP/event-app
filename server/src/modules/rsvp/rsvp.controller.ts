@@ -4,7 +4,7 @@ import { RsvpService } from './rsvp.service';
 export class RsvpController {
   private service = new RsvpService();
 
-  // GET /api/events/:id/rsvp — get my RSVP status
+  // GET /api/events/:id/rsvp 
   getMyRsvp = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const eventId = Number(req.params.id);
@@ -15,7 +15,7 @@ export class RsvpController {
     }
   };
 
-  // POST /api/events/:id/rsvp — create or update RSVP
+  // POST /api/events/:id/rsvp 
   upsertRsvp = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const eventId = Number(req.params.id);
@@ -27,7 +27,7 @@ export class RsvpController {
     }
   };
 
-  // DELETE /api/events/:id/rsvp — remove RSVP
+  // DELETE /api/events/:id/rsvp 
   deleteRsvp = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const eventId = Number(req.params.id);
@@ -38,7 +38,7 @@ export class RsvpController {
     }
   };
 
-  // GET /api/events/:id/rsvps — get all RSVPs (organizer/admin only)
+  // GET /api/events/:id/rsvps  (organizer/admin only)
   getAllRsvps = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const eventId = Number(req.params.id);
@@ -49,7 +49,7 @@ export class RsvpController {
     }
   };
 
-  // GET /api/events/:id/rsvp-counts — public RSVP counts
+  // GET /api/events/:id/rsvp-counts 
   getRsvpCounts = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const eventId = Number(req.params.id);

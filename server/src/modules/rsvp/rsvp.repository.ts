@@ -18,7 +18,7 @@ export interface RsvpWithUser extends RsvpRow {
 
 export class RsvpRepository {
 
-  // Get a single user's RSVP for an event
+  // Get a single user RSVP for an event
   async findByEventAndUser(eventId: number, userId: number): Promise<RsvpRow | undefined> {
     return db('rsvps').where({ event_id: eventId, user_id: userId }).first();
   }
@@ -55,7 +55,7 @@ export class RsvpRepository {
     return counts;
   }
 
-  // Create or update RSVP (upsert)
+  // Create or update RSVP 
   async upsert(eventId: number, userId: number, status: RsvpStatus): Promise<void> {
     const existing = await this.findByEventAndUser(eventId, userId);
     if (existing) {

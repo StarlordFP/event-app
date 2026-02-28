@@ -4,7 +4,7 @@ import { AdminService } from './admin.service';
 export class AdminController {
   private service = new AdminService();
 
-  // ─── Users ────────────────────────────────────────────────
+  // Users
 
   getAllUsers = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -36,7 +36,7 @@ export class AdminController {
     }
   };
 
-  // ─── Events ───────────────────────────────────────────────
+  // Events
 
   getAllEvents = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {

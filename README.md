@@ -160,10 +160,6 @@ TWO_FA_APP_NAME=EventApp
 | POST | `/api/auth/refresh` | No | Refresh access token |
 | POST | `/api/auth/verify-email` | No | Verify email with token |
 | POST | `/api/auth/resend-verification` | No | Resend verification email |
-| POST | `/api/auth/2fa/setup` | Yes | Generate 2FA QR code |
-| POST | `/api/auth/2fa/enable` | Yes | Enable 2FA |
-| POST | `/api/auth/2fa/verify` | No | Verify 2FA code on login |
-| POST | `/api/auth/2fa/disable` | Yes | Disable 2FA |
 
 ### Events
 | Method | Endpoint | Auth | Description |

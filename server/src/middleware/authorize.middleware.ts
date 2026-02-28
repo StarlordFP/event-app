@@ -3,11 +3,6 @@ import { ForbiddenError, UnauthorizedError } from '../shared/errors';
 
 export type Role = 'admin' | 'organizer' | 'attendee';
 
-/**
- * Role-based authorization middleware.
- * Must be used AFTER authenticate middleware.
- * Usage: authorize('admin') or authorize('admin', 'organizer')
- */
 export function authorize(...roles: Role[]) {
   return (req: Request, _res: Response, next: NextFunction): void => {
     if (!req.user) {

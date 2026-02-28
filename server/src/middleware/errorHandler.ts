@@ -1,10 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../shared/errors';
 
-/**
- * Global error handler. Classifies by type and returns consistent JSON.
- * Controllers let errors bubble here — no try/catch soup.
- */
+
 export function errorHandler(
   err: Error,
   _req: Request,
@@ -30,7 +27,7 @@ export function errorHandler(
     return;
   }
 
-  // Unknown / programming errors — log and hide details from client
+  // Unknown / programming errors
   console.error('Unhandled error', err.message, err.stack);
   res.status(500).json({
     error: 'An unexpected error occurred',
@@ -38,7 +35,7 @@ export function errorHandler(
   });
 }
 
-/** 404 for unknown routes. */
+// unknown routes
 export function notFound(req: Request, res: Response): void {
   res.status(404).json({ error: 'Not found', path: req.path });
 }

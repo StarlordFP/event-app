@@ -66,8 +66,6 @@ export class AuthService {
     return { message: 'Account created. Please verify your email.' };
   }
 
-  // Login checks credentials and issues tokens. If 2FA is enabled, it returns a flag instead and waits for the 2FA code.
-
   async login(dto: LoginDto): Promise<LoginResult> {
     const user = await this.repo.findUserByEmail(dto.email);
     if (!user) throw new UnauthorizedError('Invalid email or password');
@@ -145,7 +143,7 @@ export class AuthService {
   }
 
 
-  // ─── Private ─────────────────────────────────────────────
+  // Private
 
   private async issueTokens(user: {
     id: number;

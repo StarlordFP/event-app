@@ -20,12 +20,10 @@ export class AuthController {
     res.clearCookie(config.REFRESH_COOKIE_NAME, { path: '/', httpOnly: true });
   }
 
-  // ─── Existing ─────────────────────────────────────────────
-
   signup = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const result = await this.service.signup(req.body);
-      res.status(201).json(result); // just returns { message }
+      res.status(201).json(result); 
     } catch (err) {
       next(err);
     }
@@ -34,11 +32,7 @@ export class AuthController {
   login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const result = await this.service.login(req.body);
-      // if 2FA required, don't set cookie yet
-      if (result.requires2FA) {
-        res.json({ requires2FA: true, userId: result.userId });
-        return;
-      }
+      
       this.setRefreshCookie(res, result.refreshToken!);
       res.json({ user: result.user, token: result.token });
     } catch (err) {
@@ -70,8 +64,7 @@ export class AuthController {
     }
   };
 
-  // ─── Email Verification ───────────────────────────────────
-
+  // Email Verification
   verifyEmail = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const result = await this.service.verifyEmail(req.body.token);

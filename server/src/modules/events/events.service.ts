@@ -4,10 +4,7 @@ import { NotFoundError, ForbiddenError } from '../../shared/errors';
 import type { EventQuery, CreateEventDto, UpdateEventDto } from './events.schema';
 import type { EventWithTags } from './events.repository';
 
-/**
- * Business logic for events: visibility rules, creator checks, tag sync.
- * Orchestrates repositories; no HTTP or raw DB here.
- */
+
 export class EventsService {
   private repo = new EventsRepository();
   private tagsRepo = new TagsRepository();
