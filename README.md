@@ -221,12 +221,12 @@ GET /api/events?page=1&limit=10&filter=upcoming&tag=music&event_type=public&sear
 ## Development Workflow
 
 ```bash
-# Database only via Docker, everything else manual (recommended for active development)
+# Database only via Docker, everything else manual 
 docker-compose up mysql -d
 cd server && npm run dev     # hot reload
 cd client && npm run dev     # hot reload with Vite HMR
 
-# Full Docker (recommended for testing / submission)
+# Full Docker 
 docker-compose up --build -d
 ```
 
