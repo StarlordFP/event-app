@@ -1,21 +1,22 @@
 import nodemailer from 'nodemailer';
+import { config } from '../config';  
+
+console.log('EMAIL_USER:', config.EMAIL_USER);
+console.log('EMAIL_PASS:', config.EMAIL_PASS ? 'SET' : 'EMPTY');
 
 export const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: config.EMAIL_USER,   
+    pass: config.EMAIL_PASS,   
   },
 });
 
-export const sendVerificationEmail = async (
-  email: string,
-  token: string
-) => {
-  const verificationUrl = `${process.env.CLIENT_URL}/verify-email?token=${token}`;
+export const sendVerificationEmail = async (email: string, token: string) => {
+  const verificationUrl = `${config.CLIENT_URL}/verify-email?token=${token}`;
 
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM,
+    from: config.EMAIL_FROM,   
     to: email,
     subject: 'Verify your email',
     html: `
@@ -25,7 +26,4 @@ export const sendVerificationEmail = async (
       <p>This link expires in 24 hours.</p>
     `,
   });
-
-  console.log('EMAIL_USER:', process.env.EMAIL_USER);
-  console.log('EMAIL_PASS:', process.env.EMAIL_PASS);
 };

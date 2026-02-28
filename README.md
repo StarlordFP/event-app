@@ -8,11 +8,14 @@ A full-stack event management application built with Node.js, TypeScript, React,
 
 - Authentication with JWT access tokens and refresh token rotation
 - Email verification on signup
+- Role-based access control (Admin, Organizer, Attendee)
 - Create, edit, and delete events
 - Public and private event visibility
+- RSVP system (Going / Maybe / Not Going)
 - Tag-based filtering
 - Search events by title, description, or location
 - Pagination
+- Admin dashboard for user and event management
 
 ---
 
@@ -41,14 +44,23 @@ event-app/
 
 ---
 
-## Getting Started
+## Roles
 
+| Role | Permissions |
+|------|------------|
+| **Attendee** | View public events, RSVP to events (default role on signup) |
+| **Organizer** | All attendee permissions + create, edit, delete own events |
+| **Admin** | All permissions + manage users, change roles, delete any event |
+
+> Admin account is seeded automatically. See [Default Admin](#default-admin) below.
+
+---
+
+## Getting Started
 
 ### Manual Setup
 
-**Prerequisites:**
-- Node.js 18+
-- MySQL 8 running locally
+**Prerequisites:** Node.js 20+, MySQL 8 running locally.
 
 #### 1. Clone the repo
 ```bash
@@ -56,22 +68,19 @@ git clone https://github.com/StarlordFP/event-app.git
 cd event-app
 ```
 
-#### 2. Set up the database
+#### 2. Start the database
 ```bash
-# Start MySQL (Docker just for DB)
+# Start MySQL via Docker
 docker-compose up mysql -d
-
-# Or use your local MySQL and create the database manually:
-# CREATE DATABASE event_app;
 ```
 
 #### 3. Set up the server
 ```bash
 cd server
-cp ../.env.example .env
-# Edit .env with your values
+cp ../.env.example .env   # then edit .env with your values
 npm install
 npx knex migrate:latest
+npx knex seed:run
 npm run dev
 ```
 
@@ -88,11 +97,28 @@ Client runs at: `http://localhost:5173`
 
 ---
 
+## Default Admin
+
+A default admin account is created automatically when you run seeds:
+
+```
+Email:    admin@eventapp.com
+Password: admin123
+```
+
+> Login with this account to access the Admin Dashboard and manage users and roles.
+
+---
+
 ## Environment Variables
 
-Copy `.env.example` to `.env` in the root folder and fill in the values:
+Copy `.env.example` to `server/.env` (for manual mode) or `.env` (for Docker) and fill in the values:
 
 ```env
+# Server
+PORT=4000
+CORS_ORIGIN=http://localhost:5173
+
 # Database
 DB_HOST=127.0.0.1
 DB_PORT=3306
@@ -144,29 +170,68 @@ TWO_FA_APP_NAME=EventApp
 |--------|----------|------|-------------|
 | GET | `/api/events` | Optional | List events (search, filter, sort) |
 | GET | `/api/events/:id` | Optional | Get single event |
-| POST | `/api/events` | Yes | Create event |
-| PATCH | `/api/events/:id` | Yes | Update event |
-| DELETE | `/api/events/:id` | Yes | Delete event |
+| POST | `/api/events` | Organizer / Admin | Create event |
+| PATCH | `/api/events/:id` | Organizer / Admin | Update event |
+| DELETE | `/api/events/:id` | Organizer / Admin | Delete event |
+
+### RSVP
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/events/:id/rsvp-counts` | No | Get RSVP counts for event |
+| GET | `/api/events/:id/rsvp` | Yes | Get my RSVP status |
+| POST | `/api/events/:id/rsvp` | Yes | Create or update RSVP |
+| DELETE | `/api/events/:id/rsvp` | Yes | Remove RSVP |
+| GET | `/api/events/:id/rsvps` | Organizer / Admin | Get all RSVPs for event |
 
 ### Tags
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
 | GET | `/api/tags` | No | List all tags |
 
+### Admin
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/admin/users` | Admin | List all users |
+| PATCH | `/api/admin/users/:id/role` | Admin | Change user role |
+| DELETE | `/api/admin/users/:id` | Admin | Delete user |
+| GET | `/api/admin/events` | Admin | List all events including private |
+| DELETE | `/api/admin/events/:id` | Admin | Delete any event |
+
 #### Event Query Parameters
 ```
 GET /api/events?page=1&limit=10&filter=upcoming&tag=music&event_type=public&search=concert&sort_by=date&sort_order=asc
 ```
 
+| Parameter | Values | Description |
+|-----------|--------|-------------|
+| `page` | number | Page number (default: 1) |
+| `limit` | number | Results per page (default: 10) |
+| `filter` | `upcoming`, `past` | Filter by date |
+| `tag` | string | Filter by tag name |
+| `event_type` | `public`, `private` | Filter by visibility |
+| `search` | string | Search title, description, location |
+| `sort_by` | `date`, `created_at`, `popularity` | Sort field |
+| `sort_order` | `asc`, `desc` | Sort direction |
+
 ---
 
-## Development
+## Known Limitations
+
+- Private events are currently only visible to the creator
+- An invite system (email invitations for private events) is planned as a future enhancement
+
+---
+
+## Development Workflow
 
 ```bash
-# Run only the database via Docker, everything else manually
+# Database only via Docker, everything else manual (recommended for active development)
 docker-compose up mysql -d
-cd server && npm run dev
-cd client && npm run dev
+cd server && npm run dev     # hot reload
+cd client && npm run dev     # hot reload with Vite HMR
+
+# Full Docker (recommended for testing / submission)
+docker-compose up --build -d
 ```
 
 ---

@@ -189,6 +189,26 @@ input, textarea, select {
   border-radius: 6px;
 }
 
+/* Badge indicating whether an event is public or private */
+.event-type {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.15rem 0.4rem;
+  border-radius: var(--radius);
+  text-transform: capitalize;
+  display: inline-block;
+}
+
+.event-type.public {
+  background: rgba(76, 175, 80, 0.2); /* greenish */
+  color: var(--success);
+}
+
+.event-type.private {
+  background: rgba(232, 93, 93, 0.2); /* reddish */
+  color: var(--danger);
+}
+
 .pagination {
   display: flex;
   align-items: center;

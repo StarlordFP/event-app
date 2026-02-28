@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 
-type User = { id: number; email: string; name: string };
+// Define a User type that matches the server's JWT payload structure
+type User = { id: number; email: string; name: string; role: string }
 
 interface AuthContextValue {
   user: User | null;

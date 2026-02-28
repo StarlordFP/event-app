@@ -1,5 +1,4 @@
-import { Outlet } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { Outlet, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function Layout() {
@@ -20,8 +19,35 @@ export default function Layout() {
             <Link to="/" className="btn btn-ghost">Events</Link>
             {token ? (
               <>
-                <Link to="/events/new" className="btn btn-primary">New Event</Link>
-                <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>{user?.name}</span>
+                {/* Only organizers and admins see New Event */}
+                {(user?.role === 'organizer' || user?.role === 'admin') && (
+                  <Link to="/events/new" className="btn btn-primary">New Event</Link>
+                )}
+
+                {/* Admin dashboard link */}
+                {user?.role === 'admin' && (
+                  <Link to="/admin" className="btn btn-ghost" style={{ color: 'var(--primary)' }}>
+                    Admin
+                  </Link>
+                )}
+
+                {/* User name + role badge */}
+                <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  {user?.name}
+                  {user?.role !== 'attendee' && (
+                    <span style={{
+                      fontSize: '0.7rem',
+                      padding: '1px 7px',
+                      borderRadius: '4px',
+                      fontWeight: 700,
+                      background: user?.role === 'admin' ? '#fee2e2' : '#dbeafe',
+                      color: user?.role === 'admin' ? '#dc2626' : '#2563eb',
+                    }}>
+                      {user?.role}
+                    </span>
+                  )}
+                </span>
+
                 <button type="button" className="btn btn-ghost" onClick={logout}>Log out</button>
               </>
             ) : (

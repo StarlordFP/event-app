@@ -7,6 +7,8 @@ import { eventsRouter } from './modules/events/events.router';
 import { tagsRouter } from './modules/tags/tags.router';
 import { swaggerUiHandler, swaggerSetup } from './swagger';
 import { notFound, errorHandler } from './middleware/errorHandler';
+import { adminRouter } from './modules/admin/admin.router';
+import { rsvpRouter } from './modules/rsvp/rsvp.router';
 
 const app = express();
 
@@ -16,7 +18,9 @@ app.use(express.json());
 
 app.use('/api/auth', authRouter);
 app.use('/api/events', eventsRouter);
+app.use('/api/events/:id', rsvpRouter);
 app.use('/api/tags', tagsRouter);
+app.use('/api/admin', adminRouter);
 
 app.use('/api-docs', swaggerUiHandler, swaggerSetup);
 

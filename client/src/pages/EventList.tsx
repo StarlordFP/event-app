@@ -194,7 +194,8 @@ export default function EventList() {
             <div className="card">
               <h2 className="card-title">{event.title}</h2>
               <p className="card-meta">
-                {new Date(event.event_date).toLocaleString()} · {event.location || 'No location'} · {event.event_type}
+                {new Date(event.event_date).toLocaleString()} · {event.location || 'No location'} · 
+                <span className={`event-type ${event.event_type}`}>{event.event_type}</span>
               </p>
               {event.creator_name && <p className="card-meta">by {event.creator_name}</p>}
               {event.tags && event.tags.length > 0 && (

@@ -11,6 +11,7 @@ export interface EventRow {
   user_id: number;
   created_at: string;
   creator_name?: string;
+  rsvp_count?: number;  // ← added for popularity sorting
 }
 
 export interface EventWithTags extends EventRow {
@@ -24,14 +25,11 @@ interface ListQuery {
   tag?: string;
   event_type?: string;
   requesterId?: number;
-  search?: string;                              
-  sort_by?: 'date' | 'popularity' | 'created_at'; 
+  search?: string;
+  sort_by?: 'date' | 'popularity' | 'created_at';
   sort_order?: 'asc' | 'desc';
 }
 
-/**
- * Events table and event-tag joins. All Knex queries live here.
- */
 export class EventsRepository {
   private readonly TABLE = 'events';
   private tagsRepo = new TagsRepository();
@@ -39,6 +37,12 @@ export class EventsRepository {
   private baseSelect() {
     return db(this.TABLE)
       .leftJoin('users', 'users.id', 'events.user_id')
+      // Join RSVP count for popularity sorting
+      .leftJoin(
+        db('rsvps').where('status', 'yes').groupBy('event_id')
+          .select('event_id').count('* as rsvp_count').as('rsvp_counts'),
+        'rsvp_counts.event_id', 'events.id'
+      )
       .select(
         'events.id',
         'events.title',
@@ -48,7 +52,8 @@ export class EventsRepository {
         'events.event_type',
         'events.user_id',
         'events.created_at',
-        'users.name as creator_name'
+        'users.name as creator_name',
+        db.raw('COALESCE(rsvp_counts.rsvp_count, 0) as rsvp_count')
       );
   }
 
@@ -80,7 +85,6 @@ export class EventsRepository {
       }
     }
 
-    // Search in title, description, and location for the search term
     if (search) {
       q = q.andWhere(function (this: any) {
         this.whereILike('events.title', `%${search}%`)
@@ -89,14 +93,15 @@ export class EventsRepository {
       });
     }
 
-    // Sorting 
+    // Sorting
     const order = sort_order ?? 'desc';
     if (sort_by === 'date') {
       q = q.orderBy('events.event_date', order);
     } else if (sort_by === 'created_at') {
       q = q.orderBy('events.created_at', order);
+    } else if (sort_by === 'popularity') {
+      q = q.orderBy('rsvp_count', order);  // ← popularity sort
     } else {
-      // default
       q = q.orderBy('events.event_date', 'asc');
     }
 

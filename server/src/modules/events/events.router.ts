@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { authenticate, optionalAuth } from '../../middleware/auth.middleware';
+import { authorize } from '../../middleware/authorize.middleware';
 import { validate } from '../../middleware/validate.middleware';
 import { EventsController } from './events.controller';
 import {
@@ -25,12 +26,14 @@ router.get(
 router.post(
   '/',
   authenticate,
+  authorize('organizer', 'admin'),
   validate('body', CreateEventSchema),
   ctrl.create
 );
 router.patch(
   '/:id',
   authenticate,
+  authorize('organizer', 'admin'),
   validate('params', EventIdParamSchema),
   validate('body', UpdateEventSchema),
   ctrl.update
@@ -38,6 +41,7 @@ router.patch(
 router.delete(
   '/:id',
   authenticate,
+  authorize('organizer', 'admin'),
   validate('params', EventIdParamSchema),
   ctrl.remove
 );

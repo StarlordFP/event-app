@@ -6,6 +6,7 @@ export interface UserRow {
   name: string;
   password_hash: string;
   is_verified: boolean;
+  role: 'admin' | 'organizer' | 'attendee';
 }
 
 export interface EmailVerificationRow {
@@ -100,40 +101,5 @@ export class AuthRepository {
       .update({ is_used: true });
   }
 
-  // ─── 2FA methods ─────────────────────────────────────────
 
-  async create2FASecret(data: {
-    user_id: number;
-    secret: string;
-  }): Promise<void> {
-    await db('user_2fa').insert(data);
-  }
-
-  async get2FAByUserId(userId: number): Promise<TwoFARow | undefined> {
-    return db('user_2fa').where({ user_id: userId }).first();
-  }
-
-  async enable2FA(userId: number): Promise<void> {
-    await db('user_2fa')
-      .where({ user_id: userId })
-      .update({ is_enabled: true });
-  }
-
-  async disable2FA(userId: number): Promise<void> {
-    await db('user_2fa').where({ user_id: userId }).del();
-  }
-
-  async upsert2FASecret(data: {
-    user_id: number;
-    secret: string;
-  }): Promise<void> {
-    const existing = await this.get2FAByUserId(data.user_id);
-    if (existing) {
-      await db('user_2fa')
-        .where({ user_id: data.user_id })
-        .update({ secret: data.secret, is_enabled: false });
-    } else {
-      await this.create2FASecret(data);
-    }
-  }
 }

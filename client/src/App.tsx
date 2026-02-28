@@ -10,11 +10,18 @@ import EditEvent from './pages/EditEvent';
 import VerifyEmail from './pages/VerifyEmail';
 import ResendVerification from './pages/ResendVerification';
 import TwoFactorVerify from './pages/TwoFactorVerify';
+import AdminDashboard from './pages/AdminDashboard';
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { token, isReady } = useAuth();
+function ProtectedRoute({ children, requiredRole }: { 
+  children: React.ReactNode;
+  requiredRole?: string;
+}) {
+  const { token, user, isReady } = useAuth();
   if (!isReady) return <div className="app-container">Loading...</div>;
   if (!token) return <Navigate to="/login" replace />;
+  if (requiredRole && user?.role !== requiredRole) {
+    return <Navigate to="/" replace />;
+  }
   return <>{children}</>;
 }
 
@@ -44,6 +51,15 @@ export default function App() {
           element={
             <ProtectedRoute>
               <EditEvent />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="admin"
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <AdminDashboard />
             </ProtectedRoute>
           }
         />

@@ -15,8 +15,8 @@ export const config = {
 
   DB_HOST: process.env.DB_HOST || '127.0.0.1',
   DB_PORT: Number(process.env.DB_PORT) || 3306,
-  DB_USER: process.env.DB_USER || 'root',
-  DB_PASSWORD: process.env.DB_PASSWORD || '',
+  DB_USER: process.env.DB_USER || 'app',
+  DB_PASSWORD: process.env.DB_PASSWORD || 'app',
   DB_NAME: process.env.DB_NAME || 'event_app',
 
   TWO_FA_APP_NAME: process.env.TWO_FA_APP_NAME || 'EventApp',

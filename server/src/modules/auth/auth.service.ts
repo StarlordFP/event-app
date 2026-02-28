@@ -22,7 +22,7 @@ function hashRefreshToken(raw: string): string {
 }
 
 export interface AuthResult {
-  user: { id: number; email: string; name: string };
+  user: { id: number; email: string; name: string; role: string };
   token: string;
   refreshToken: string;
 }
@@ -30,7 +30,7 @@ export interface AuthResult {
 export interface LoginResult {
   requires2FA: boolean;
   userId?: number;
-  user?: { id: number; email: string; name: string };
+  user?: { id: number; email: string; name: string, role: string };
   token?: string;
   refreshToken?: string;
 }
@@ -80,12 +80,6 @@ export class AuthService {
       throw new UnauthorizedError('Please verify your email before logging in');
     }
 
-    // check if 2FA is enabled
-    const twoFA = await this.repo.get2FAByUserId(user.id);
-    if (twoFA?.is_enabled) {
-      // don't issue tokens yet — wait for 2FA code
-      return { requires2FA: true, userId: user.id };
-    }
 
     const result = await this.issueTokens(user);
     return { requires2FA: false, ...result };
@@ -150,84 +144,6 @@ export class AuthService {
     return { message: 'Verification email resent' };
   }
 
-  // 2FA
-
-  async setup2FA(userId: number): Promise<{ qrCode: string; secret: string }> {
-    const user = await this.repo.findUserById(userId);
-    if (!user) throw new NotFoundError('User not found');
-
-    const existing = await this.repo.get2FAByUserId(userId);
-    if (existing?.is_enabled) {
-      throw new BadRequestError('2FA is already enabled');
-    }
-
-    // generate secret
-    const secret = speakeasy.generateSecret({
-      name: `${config.TWO_FA_APP_NAME} (${user.email})`,
-    });
-
-    // save secret (not enabled yet)
-    await this.repo.upsert2FASecret({
-      user_id: userId,
-      secret: secret.base32,
-    });
-
-    // generate QR code
-    const qrCode = await qrcode.toDataURL(secret.otpauth_url!);
-
-    return { qrCode, secret: secret.base32 };
-  }
-
-  async enable2FA(userId: number, code: string): Promise<{ message: string }> {
-    const twoFA = await this.repo.get2FAByUserId(userId);
-    if (!twoFA) throw new NotFoundError('2FA setup not found. Run setup first.');
-    if (twoFA.is_enabled) throw new BadRequestError('2FA already enabled');
-
-    const valid = speakeasy.totp.verify({
-      secret: twoFA.secret,
-      encoding: 'base32',
-      token: code,
-      window: 1,
-    });
-    if (!valid) throw new UnauthorizedError('Invalid 2FA code');
-
-    await this.repo.enable2FA(userId);
-    return { message: '2FA enabled successfully' };
-  }
-
-  async verify2FA(userId: number, code: string): Promise<AuthResult> {
-    const twoFA = await this.repo.get2FAByUserId(userId);
-    if (!twoFA?.is_enabled) throw new BadRequestError('2FA not enabled for this user');
-
-    const valid = speakeasy.totp.verify({
-      secret: twoFA.secret,
-      encoding: 'base32',
-      token: code,
-      window: 1,
-    });
-    if (!valid) throw new UnauthorizedError('Invalid 2FA code');
-
-    const user = await this.repo.findUserById(userId);
-    if (!user) throw new NotFoundError('User not found');
-
-    return this.issueTokens(user);
-  }
-
-  async disable2FA(userId: number, code: string): Promise<{ message: string }> {
-    const twoFA = await this.repo.get2FAByUserId(userId);
-    if (!twoFA?.is_enabled) throw new BadRequestError('2FA is not enabled');
-
-    const valid = speakeasy.totp.verify({
-      secret: twoFA.secret,
-      encoding: 'base32',
-      token: code,
-      window: 1,
-    });
-    if (!valid) throw new UnauthorizedError('Invalid 2FA code');
-
-    await this.repo.disable2FA(userId);
-    return { message: '2FA disabled successfully' };
-  }
 
   // ─── Private ─────────────────────────────────────────────
 
@@ -235,9 +151,10 @@ export class AuthService {
     id: number;
     email: string;
     name: string;
+    role: string;   
   }): Promise<AuthResult> {
     const token = jwt.sign(
-      { userId: user.id, email: user.email },
+      { userId: user.id, email: user.email, role: user.role }, 
       config.JWT_SECRET,
       { algorithm: 'HS256', expiresIn: config.ACCESS_TOKEN_TTL } as jwt.SignOptions
     );
@@ -252,7 +169,7 @@ export class AuthService {
       expires_at: expiresAt,
     });
     return {
-      user: { id: user.id, email: user.email, name: user.name },
+      user: { id: user.id, email: user.email, name: user.name, role: user.role },
       token,
       refreshToken: refreshRaw,
     };

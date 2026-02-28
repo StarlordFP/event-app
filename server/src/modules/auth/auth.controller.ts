@@ -89,47 +89,4 @@ export class AuthController {
       next(err);
     }
   };
-
-  // ─── 2FA ──────────────────────────────────────────────────
-
-  setup2FA = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      const userId = (req as any).user.userId;
-      const result = await this.service.setup2FA(userId);
-      res.json(result);
-    } catch (err) {
-      next(err);
-    }
-  };
-
-  enable2FA = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      const userId = (req as any).user.userId;
-      const result = await this.service.enable2FA(userId, req.body.code);
-      res.json(result);
-    } catch (err) {
-      next(err);
-    }
-  };
-
-  verify2FA = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      const { userId, code } = req.body;
-      const { user, token, refreshToken } = await this.service.verify2FA(userId, code);
-      this.setRefreshCookie(res, refreshToken);
-      res.json({ user, token });
-    } catch (err) {
-      next(err);
-    }
-  };
-
-  disable2FA = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      const userId = (req as any).user.userId;
-      const result = await this.service.disable2FA(userId, req.body.code);
-      res.json(result);
-    } catch (err) {
-      next(err);
-    }
-  };
 }
