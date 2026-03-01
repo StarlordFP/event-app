@@ -26,7 +26,7 @@ A full-stack event management application built with Node.js, TypeScript, React,
 | Frontend | React, TypeScript, Vite |
 | Backend | Node.js, Express, TypeScript |
 | Database | MySQL 8 |
-| ORM / Query Builder | Knex.js |
+| Query Builder | Knex.js |
 | Auth | JWT, bcrypt, nodemailer |
 | Containerization | Docker, Docker Compose |
 
@@ -138,9 +138,6 @@ EMAIL_PASS=your-16-char-app-password
 EMAIL_FROM=Event App <your@gmail.com>
 CLIENT_URL=http://localhost:5173
 
-# 2FA
-TWO_FA_APP_NAME=EventApp
-```
 
 ### Getting a Gmail App Password:
 1. Go to [myaccount.google.com](https://myaccount.google.com)
