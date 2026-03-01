@@ -1,6 +1,7 @@
 # Event App
 
-A full-stack event management application built with Node.js, TypeScript, React, and MySQL.
+Built for my Leapfrog Associate Engineer assignment. 
+An event management app where users can create events, RSVP, and admins can manage everything.
 
 ---
 
@@ -166,7 +167,6 @@ REFRESH_TOKEN_DAYS=7
 EMAIL_USER=your@gmail.com
 EMAIL_PASS=your-16-char-app-password
 EMAIL_FROM=Event App <your@gmail.com>
-TWO_FA_APP_NAME=EventApp
 ```
 
 ### For Manual Dev (`server/.env`):
@@ -262,9 +262,13 @@ docker ps                        # list running containers
 
 ## Known Limitations
 
-- Private events are currently only visible to the creator
-- An invite system (email invitations for private events) is planned as a future enhancement
+Private events don't have an invite system yet 
+— planning to add email invites later
 
+
+## Notes
+This was my first time setting up Docker with a full-stack app.
+Learned a lot about multi-stage builds and container networking!
 ---
 
 ## License
