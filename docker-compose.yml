@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # MySQL Database
   mysql:
     image: mysql:8.0
     environment:
@@ -18,6 +19,54 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    networks:
+      - app-network
+
+  # Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: app
+      DB_PASSWORD: app
+      DB_NAME: event_app
+      JWT_SECRET: ${JWT_SECRET}
+      ACCESS_TOKEN_TTL: ${ACCESS_TOKEN_TTL:-15m}
+      REFRESH_TOKEN_DAYS: ${REFRESH_TOKEN_DAYS:-7}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+      EMAIL_USER: ${EMAIL_USER}
+      EMAIL_PASS: ${EMAIL_PASS}
+      EMAIL_FROM: ${EMAIL_FROM}
+      CLIENT_URL: ${CLIENT_URL:-http://localhost:3000}
+      TWO_FA_APP_NAME: ${TWO_FA_APP_NAME:-EventApp}
+    ports:
+      - "4000:4000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  # Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - server
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   mysql_data:

@@ -14,8 +14,10 @@ A full-stack event management application built with Node.js, TypeScript, React,
 - RSVP system (Going / Maybe / Not Going)
 - Tag-based filtering
 - Search events by title, description, or location
+- Sort events by date, popularity, or creation time
 - Pagination
 - Admin dashboard for user and event management
+- Dockerized for easy setup and deployment
 
 ---
 
@@ -36,10 +38,18 @@ A full-stack event management application built with Node.js, TypeScript, React,
 
 ```
 event-app/
-├── client/          # React frontend
-├── server/          # Express backend
+├── client/            # React frontend
+│   ├── src/
+│   ├── Dockerfile
+│   └── nginx.conf
+├── server/            # Express backend
+│   ├── src/
+│   ├── migrations/
+│   ├── seeds/
+│   └── Dockerfile
 ├── docker-compose.yml
-└── .env.example
+├── .env.example
+└── README.md
 ```
 
 ---
@@ -58,7 +68,35 @@ event-app/
 
 ## Getting Started
 
-### Manual Setup
+### Option 1: Docker (Recommended)
+
+**Prerequisites:** Docker and Docker Compose installed.
+
+#### 1. Clone the repo
+```bash
+git clone https://github.com/StarlordFP/event-app.git
+cd event-app
+```
+
+#### 2. Set up environment variables
+```bash
+cp .env.example .env
+# Edit .env with your values (JWT_SECRET, EMAIL_USER, EMAIL_PASS)
+```
+
+#### 3. Run with Docker
+```bash
+docker-compose up --build -d
+```
+
+- Frontend: http://localhost:3000
+- Backend:  http://localhost:4000
+
+> Migrations and seeds run automatically on startup.
+
+---
+
+### Option 2: Manual Setup
 
 **Prerequisites:** Node.js 20+, MySQL 8 running locally.
 
@@ -112,32 +150,32 @@ Password: admin123
 
 ## Environment Variables
 
-Copy `.env.example` to `server/.env` (for manual mode) or `.env` (for Docker) and fill in the values:
-
+### For Docker (root `.env`):
 ```env
-# Server
 PORT=4000
-CORS_ORIGIN=http://localhost:5173
-
-# Database
-DB_HOST=127.0.0.1
+DB_HOST=mysql
 DB_PORT=3306
 DB_USER=app
 DB_PASSWORD=app
 DB_NAME=event_app
-
-# JWT — use a long random string in production!
+CORS_ORIGIN=http://localhost:3000
+CLIENT_URL=http://localhost:3000
 JWT_SECRET=change-this-to-a-long-random-string
 ACCESS_TOKEN_TTL=15m
 REFRESH_TOKEN_DAYS=7
-
-# Email — requires a Gmail App Password
-# Get one at: myaccount.google.com/apppasswords
 EMAIL_USER=your@gmail.com
 EMAIL_PASS=your-16-char-app-password
 EMAIL_FROM=Event App <your@gmail.com>
-CLIENT_URL=http://localhost:5173
+TWO_FA_APP_NAME=EventApp
+```
 
+### For Manual Dev (`server/.env`):
+Same as above but change:
+```env
+DB_HOST=127.0.0.1   # local MySQL
+CORS_ORIGIN=http://localhost:5173
+CLIENT_URL=http://localhost:5173
+```
 
 ### Getting a Gmail App Password:
 1. Go to [myaccount.google.com](https://myaccount.google.com)
@@ -208,24 +246,24 @@ GET /api/events?page=1&limit=10&filter=upcoming&tag=music&event_type=public&sear
 
 ---
 
+## Useful Docker Commands
+
+```bash
+docker-compose up --build -d     # build and start all containers
+docker-compose up -d             # start without rebuilding
+docker-compose down              # stop all containers
+docker-compose down -v           # stop and delete database volume
+docker-compose logs server       # view server logs
+docker-compose logs client       # view client logs
+docker ps                        # list running containers
+```
+
+---
+
 ## Known Limitations
 
 - Private events are currently only visible to the creator
 - An invite system (email invitations for private events) is planned as a future enhancement
-
----
-
-## Development Workflow
-
-```bash
-# Database only via Docker, everything else manual 
-docker-compose up mysql -d
-cd server && npm run dev     # hot reload
-cd client && npm run dev     # hot reload with Vite HMR
-
-# Full Docker 
-docker-compose up --build -d
-```
 
 ---
 
