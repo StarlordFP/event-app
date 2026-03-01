@@ -68,7 +68,7 @@ event-app/
 
 ## Getting Started
 
-### Option 1: Docker (Recommended)
+### Using Docker
 
 **Prerequisites:** Docker and Docker Compose installed.
 
@@ -96,7 +96,7 @@ docker-compose up --build -d
 
 ---
 
-### Option 2: Manual Setup
+### Manual Setup
 
 **Prerequisites:** Node.js 20+, MySQL 8 running locally.
 
