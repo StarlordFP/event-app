@@ -3,15 +3,16 @@ import { Link } from 'react-router-dom';
 import { api, type EventListResponse, type EventItem, type TagItem } from '../api/client';
 
 type Filter = 'upcoming' | 'past' | '';
-type SortBy = 'date' | 'created_at' | '';
+type SortBy = 'date' | 'created_at' | 'popularity' | '';
 type SortOrder = 'asc' | 'desc';
 
-const selectStyle = {
+const selectStyle: React.CSSProperties = {
   padding: '0.4rem 0.6rem',
   borderRadius: 'var(--radius)',
   border: '1px solid var(--border)',
   background: 'var(--surface)',
   color: 'var(--text)',
+  width: '100%',
 };
 
 export default function EventList() {
@@ -83,6 +84,7 @@ export default function EventList() {
             placeholder="Search by title, description or location..."
             style={{
               flex: 1,
+              minWidth: 0,
               padding: '0.5rem 0.75rem',
               borderRadius: 'var(--radius)',
               border: '1px solid var(--border)',
@@ -91,33 +93,11 @@ export default function EventList() {
               fontSize: '0.95rem',
             }}
           />
-          <button
-            type="submit"
-            style={{
-              padding: '0.5rem 1rem',
-              borderRadius: 'var(--radius)',
-              border: 'none',
-              background: 'var(--primary)',
-              color: '#fff',
-              cursor: 'pointer',
-              fontWeight: 600,
-            }}
-          >
+          <button type="submit" className="btn btn-primary" style={{ flexShrink: 0 }}>
             Search
           </button>
           {search && (
-            <button
-              type="button"
-              onClick={handleClearSearch}
-              style={{
-                padding: '0.5rem 0.75rem',
-                borderRadius: 'var(--radius)',
-                border: '1px solid var(--border)',
-                background: 'var(--surface)',
-                color: 'var(--text-muted)',
-                cursor: 'pointer',
-              }}
-            >
+            <button type="button" onClick={handleClearSearch} className="btn btn-ghost" style={{ flexShrink: 0 }}>
               Clear
             </button>
           )}
@@ -131,17 +111,25 @@ export default function EventList() {
 
       {/* Filters + Sort */}
       <div className="card" style={{ marginBottom: '1.5rem', padding: '1rem' }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
+        {/* Row 1: Show, Tag, Type, Sort by — always 4 columns on tablet+ */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: '0.75rem',
+        }}
+          className="filters-grid"
+        >
           <div>
-            <label style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginRight: '0.5rem' }}>Show</label>
+            <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.25rem' }}>Show</label>
             <select value={filter} onChange={(e) => { setFilter(e.target.value as Filter); setPage(1); }} style={selectStyle}>
               <option value="upcoming">Upcoming</option>
               <option value="past">Past</option>
               <option value="">All</option>
             </select>
           </div>
+
           <div>
-            <label style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginRight: '0.5rem' }}>Tag</label>
+            <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.25rem' }}>Tag</label>
             <select value={tagFilter} onChange={(e) => { setTagFilter(e.target.value); setPage(1); }} style={selectStyle}>
               <option value="">All tags</option>
               {tags.map((t) => (
@@ -149,8 +137,9 @@ export default function EventList() {
               ))}
             </select>
           </div>
+
           <div>
-            <label style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginRight: '0.5rem' }}>Type</label>
+            <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.25rem' }}>Type</label>
             <select value={eventTypeFilter} onChange={(e) => { setEventTypeFilter(e.target.value); setPage(1); }} style={selectStyle}>
               <option value="">All</option>
               <option value="public">Public</option>
@@ -158,25 +147,27 @@ export default function EventList() {
             </select>
           </div>
 
-          {/* Sort */}
           <div>
-            <label style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginRight: '0.5rem' }}>Sort by</label>
+            <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.25rem' }}>Sort by</label>
             <select value={sortBy} onChange={(e) => { setSortBy(e.target.value as SortBy); setPage(1); }} style={selectStyle}>
               <option value="">Default</option>
               <option value="date">Event Date</option>
               <option value="created_at">Created Date</option>
+              <option value="popularity">Popularity</option>
             </select>
           </div>
-          {sortBy && (
-            <div>
-              <label style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginRight: '0.5rem' }}>Order</label>
-              <select value={sortOrder} onChange={(e) => { setSortOrder(e.target.value as SortOrder); setPage(1); }} style={selectStyle}>
-                <option value="desc">Newest first</option>
-                <option value="asc">Oldest first</option>
-              </select>
-            </div>
-          )}
         </div>
+
+        {/* Row 2: Order — only when sort selected */}
+        {sortBy && (
+          <div style={{ marginTop: '0.75rem', maxWidth: '200px' }}>
+            <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.25rem' }}>Order</label>
+            <select value={sortOrder} onChange={(e) => { setSortOrder(e.target.value as SortOrder); setPage(1); }} style={selectStyle}>
+              <option value="desc">Newest first</option>
+              <option value="asc">Oldest first</option>
+            </select>
+          </div>
+        )}
       </div>
 
       {error && <p className="error-message">{error}</p>}
@@ -193,8 +184,8 @@ export default function EventList() {
           <Link key={event.id} to={`/events/${event.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
             <div className="card">
               <h2 className="card-title">{event.title}</h2>
-              <p className="card-meta">
-                {new Date(event.event_date).toLocaleString()} · {event.location || 'No location'} · 
+              <p className="card-meta" style={{ wordBreak: 'break-word' }}>
+                {new Date(event.event_date).toLocaleString()} · {event.location || 'No location'} ·{' '}
                 <span className={`event-type ${event.event_type}`}>{event.event_type}</span>
               </p>
               {event.creator_name && <p className="card-meta">by {event.creator_name}</p>}
@@ -212,15 +203,20 @@ export default function EventList() {
 
       {pagination && pagination.totalPages > 1 && (
         <div className="pagination">
-          <button type="button" onClick={() => setPage((p) => p - 1)} disabled={page <= 1}>
-            Previous
-          </button>
+          <button type="button" onClick={() => setPage((p) => p - 1)} disabled={page <= 1}>Previous</button>
           <span>Page {page} of {pagination.totalPages}</span>
-          <button type="button" onClick={() => setPage((p) => p + 1)} disabled={page >= pagination.totalPages}>
-            Next
-          </button>
+          <button type="button" onClick={() => setPage((p) => p + 1)} disabled={page >= pagination.totalPages}>Next</button>
         </div>
       )}
+
+      {/* Responsive filter grid */}
+      <style>{`
+        @media (max-width: 480px) {
+          .filters-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

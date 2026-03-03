@@ -67,6 +67,8 @@ input, textarea, select {
   margin-bottom: 1.5rem;
 }
 
+/* Buttons */
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -77,6 +79,7 @@ input, textarea, select {
   font-weight: 500;
   border: none;
   transition: background 0.2s, transform 0.1s;
+  white-space: nowrap;
 }
 
 .btn:active {
@@ -115,6 +118,8 @@ input, textarea, select {
   width: 100%;
 }
 
+/* Forms */
+
 .form-group {
   margin-bottom: 1rem;
 }
@@ -152,6 +157,8 @@ input, textarea, select {
   resize: vertical;
 }
 
+/* Cards */
+
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -173,6 +180,8 @@ input, textarea, select {
   font-size: 0.875rem;
   color: var(--text-muted);
 }
+
+/* Tags */
 
 .tags-list {
   display: flex;
@@ -200,14 +209,16 @@ input, textarea, select {
 }
 
 .event-type.public {
-  background: rgba(76, 175, 80, 0.2); /* greenish */
+  background: rgba(76, 175, 80, 0.2);
   color: var(--success);
 }
 
 .event-type.private {
-  background: rgba(232, 93, 93, 0.2); /* reddish */
+  background: rgba(232, 93, 93, 0.2);
   color: var(--danger);
 }
+
+/* Paginaition */
 
 .pagination {
   display: flex;
@@ -215,6 +226,7 @@ input, textarea, select {
   justify-content: center;
   gap: 0.5rem;
   margin-top: 1.5rem;
+  flex-wrap: wrap;
 }
 
 .pagination button {
@@ -239,6 +251,8 @@ input, textarea, select {
   color: var(--text-muted);
 }
 
+/* MOdal */
+
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -255,4 +269,97 @@ input, textarea, select {
   width: 100%;
   max-height: 90vh;
   overflow: auto;
+}
+
+/* Header Nav */
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Mobile Responsiveness */
+
+/* Tablet and below */
+@media (max-width: 768px) {
+  .app-container {
+    padding: 1rem;
+  }
+
+  .page-header {
+    font-size: 1.4rem;
+  }
+
+  /* Stack header nav vertically on small screens */
+  .header-nav {
+    gap: 0.5rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+}
+
+/* Mobile only */
+@media (max-width: 480px) {
+  .app-container {
+    padding: 0.75rem;
+  }
+
+  .page-header {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Make buttons full width in forms on mobile */
+  .btn-full-width-mobile {
+    width: 100%;
+  }
+
+  /* Smaller font for card meta on mobile */
+  .card-meta {
+    font-size: 0.8rem;
+  }
+
+  /* Stack filter/sort controls */
+  .filters-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .filters-row select,
+  .filters-row input {
+    width: 100%;
+  }
+
+  /* Pagination smaller on mobile */
+  .pagination button {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.875rem;
+  }
+
+  /* RSVP buttons stack on mobile */
+  .rsvp-buttons {
+    flex-direction: column;
+  }
+
+  .rsvp-buttons button {
+    width: 100%;
+  }
+}
+
+/* Header Responsive*/
+.hamburger-btn {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .hamburger-btn {
+    display: block;
+  }
+  .desktop-nav {
+    display: none !important;
+  }
 }
