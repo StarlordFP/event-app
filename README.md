@@ -1,6 +1,5 @@
 # Event App
 
-Built for my Leapfrog Associate Engineer assignment. 
 An event management app where users can create events, RSVP, and admins can manage everything.
 
 ---
